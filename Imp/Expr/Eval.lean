@@ -1,4 +1,5 @@
 import Imp.Expr.Basic
+import Imp.Expr.Syntax
 
 open Lean
 
@@ -24,16 +25,22 @@ def get (x : String) (σ : Env) : Value :=
 def init (i : Value) : Env := fun _ => i
 
 @[simp]
-theorem get_init : (Env.init v).get x = v := by rfl
+theorem get_init : (Env.init v).get x = v := by
+  simp [Env.init, Env.get]
+  -- constant function applied to a string, reduces to the value we wanted, we're done
+  -- these proofs are trivial because simplification handles the whole thing (and thus are not that useful)
 
 @[simp]
 theorem get_set_same {σ : Env} : (σ.set x v).get x = v := by
-  simp [get, set]
+  -- simp [get, set]
+  simp [Env.init, Env.get, Env.set]
 
-@[simp]
+@[simp] -- why does this exist here?
+-- when using this later on, this tells the prover to rewrite similar expressions based on this proof
+-- to make it more concise?
 theorem get_set_different {σ : Env} : x ≠ y → (σ.set x v).get y = σ.get y := by
-  intros
-  simp [get, set, *]
+  intro h -- introduce the hypothesis that h != y
+  simp [Env.get, Env.set, *]
 
 end Env
 
@@ -59,6 +66,7 @@ def BinOp.apply : BinOp → Value → Value → Option Value
   | .eq, x, y => some (if x == y then 1 else 0)
   | .le, x, y => some (if x ≤ y then 1 else 0)
   | .lt, x, y => some (if x < y then 1 else 0)
+  | .xor, x, y => some (x ^^^ y)
 
 /--
 Evaluates an expression, finding the value if it has one.
@@ -69,9 +77,12 @@ def eval (σ : Env) : Expr → Option Value
   | .const i => some i
   | .var x => σ.get x
   | .un op e => do
-    let v ← e.eval σ
+    let v ← e.eval σ -- sigma
     op.apply v
   | .bin op e1 e2 => do
     let v1 ← e1.eval σ
     let v2 ← e2.eval σ
     op.apply v1 v2
+
+#eval (expr {19 + x / 3}).eval (Env.init 17)
+#eval (expr {x ^^^ 2}).eval (Env.init 3)

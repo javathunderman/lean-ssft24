@@ -68,6 +68,8 @@ syntax:40 exp:40 " &&& " exp:41 :exp
 /-- Bitwise or -/
 syntax:40 exp:40 " ||| " exp:41 :exp
 
+syntax:40 exp:40 " ^^^ " exp:41 :exp
+
 /-- Boolean conjunction -/
 syntax:35 exp:35 " && " exp:36 : exp
 /-- Boolean disjunction -/
@@ -99,6 +101,7 @@ macro_rules
   | `(expr{$e1 <<< $e2}) => `(Expr.bin .lsh (expr{$e1}) (expr{$e2}))
   | `(expr{$e1 ||| $e2}) => `(Expr.bin .bor (expr{$e1}) (expr{$e2}))
   | `(expr{$e1 &&& $e2}) => `(Expr.bin .band (expr{$e1}) (expr{$e2}))
+  | `(expr{$e1 ^^^ $e2}) => `(Expr.bin .xor (expr{$e1}) (expr{$e2}))
 
 
   | `(expr{$e1 && $e2}) => `(Expr.bin .and (expr{$e1}) (expr{$e2}))

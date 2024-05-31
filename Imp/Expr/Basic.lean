@@ -12,7 +12,7 @@ inductive BinOp where
   | lsh | rsh
   | band | bor
   | and | or
-  | lt | le | eq
+  | lt | le | eq | xor
 deriving Repr, DecidableEq
 
 end Expr
@@ -26,3 +26,5 @@ inductive Expr where
   | un (op : Expr.UnOp) (e : Expr)
   | bin (op : Expr.BinOp) (e1 e2 : Expr)
 deriving Repr, DecidableEq
+
+#eval Expr.const 15

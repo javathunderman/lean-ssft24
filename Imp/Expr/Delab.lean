@@ -62,6 +62,7 @@ partial def delabExprInner : DelabM (TSyntax `exp) := do
       | BinOp.rsh => `(exp| $s1 >>> $s2)
       | BinOp.band => `(exp| $s1 &&& $s2)
       | BinOp.bor => `(exp| $s1 ||| $s2)
+      | BinOp.xor => `(exp| $s1 ^^^ $s2)
       | _ => `(exp|~(Expr.bin $(← withAppFn <| withAppFn <| withAppArg delab) $(← withAppFn <| withAppArg delab) $(← withAppArg delab)))
     | Expr.un op _ =>
       let s ← withAppArg delabExprInner

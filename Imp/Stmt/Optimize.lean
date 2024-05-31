@@ -6,7 +6,8 @@ namespace Imp.Stmt
 
 /-- Optimize a statement -/
 def optimize : Stmt → Stmt
-  | imp {skip;} => imp {skip;}
+  | imp {skip;} => imp {skip;} -- this is a macro that is going to expand into Statement.skip
+                               -- valid to put in this position
   | imp {~s1 ~s2} =>
     match s1.optimize, s2.optimize with
     | imp {skip;}, s2' => s2'

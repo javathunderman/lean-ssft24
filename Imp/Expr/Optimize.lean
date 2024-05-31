@@ -12,7 +12,8 @@ def optimize : Expr → Expr
   | .un op e =>
     match optimize e with
     | .const i =>
-      if let some v := op.apply i then .const v
+      if let some i' := op.apply i then
+        .const i'
       else .un op (.const i)
     | e' => .un op e'
   | .bin op e1 e2 =>
