@@ -18,6 +18,9 @@ def optimize : Expr → Expr
     | e' => .un op e'
   | .bin op e1 e2 =>
     match optimize e1, optimize e2 with
+    | .const i, .const 0 =>
+      if op = BinOp.minus then .const i
+      else .bin op (.const i) (.const 0)
     | .const i, .const i' =>
       if let some v := op.apply i i' then .const v
       else .bin op (.const i) (.const i')
@@ -35,11 +38,12 @@ theorem optimize_ok (e : Expr) : e.eval σ = e.optimize.eval σ := by
     split <;> simp [eval, *]
     cases op <;> simp [BinOp.apply, eval]
     split
-    . simp [eval, BinOp.apply]; split <;> trivial
-    . simp [eval]
+    -- next heq => simp [eval, heq] -- another way to specifically name the hypothesis
+    . simp [eval, *];
+    . simp [eval, BinOp.apply];
 
 /--
 Optimization doesn't change the meaning of any expression
 -/
 theorem optimize_ok' (e : Expr) : e.eval σ = e.optimize.eval σ := by
-  induction e using optimize.induct <;> simp [optimize, eval, *]
+  induction e using optimize.induct <;> simp [optimize, eval, *] <;> simp [BinOp.apply]
